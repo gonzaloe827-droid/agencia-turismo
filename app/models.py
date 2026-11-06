@@ -207,8 +207,8 @@ class PasajeroSalida(Model):
     salida = relationship("Salida", back_populates="pasajeros")
     cliente = relationship("Cliente", back_populates="pasajeros_salidas")
 
-def __repr__(self):
-    return f"{self.cliente} - {self.salida}"
+    def __repr__(self):
+        return f"{self.cliente} - {self.salida}"
 
 # 9. PAGOS
 class Pago(Model):

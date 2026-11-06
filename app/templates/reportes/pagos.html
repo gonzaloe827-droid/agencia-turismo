@@ -1,0 +1,112 @@
+
+{% extends "appbuilder/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2>Reporte de pagos</h2>
+
+    <hr>
+
+    <!-- FORMULARIO DE FILTROS -->
+    <form method="GET" class="form-inline">
+
+        <div class="form-group">
+            <label>Fecha de pago:</label>
+            <input
+                type="date"
+                name="fecha_pago"
+                value="{{ fecha_pago }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group" style="margin-left: 10px;">
+            <label>Método de pago:</label>
+
+            <select name="metodo_pago" class="form-control">
+
+                <option value="">Todos</option>
+
+                <option value="Efectivo"
+                    {% if metodo_pago == "Efectivo" %}selected{% endif %}>
+                    Efectivo
+                </option>
+
+                <option value="QR"
+                    {% if metodo_pago == "QR" %}selected{% endif %}>
+                    QR
+                </option>
+
+                <option value="Tarjeta"
+                    {% if metodo_pago == "Tarjeta" %}selected{% endif %}>
+                    Tarjeta
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Buscar
+        </button>
+
+        <a href="{{ url_for('ReportePagosView.list') }}"
+           class="btn btn-default">
+            Limpiar
+        </a>
+
+    </form>
+
+    <hr>
+
+    <!-- TABLA DE RESULTADOS -->
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th>N.º de pago</th>
+                    <th>Cliente</th>
+                    <th>N.º de reserva</th>
+                    <th>Paquete turístico</th>
+                    <th>Monto pagado</th>
+                    <th>Fecha de pago</th>
+                    <th>Método de pago</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for pago in pagos %}
+
+                <tr>
+                    <td>{{ pago.pago_id }}</td>
+                    <td>{{ pago.reserva.cliente }}</td>
+                    <td>{{ pago.reserva.reserva_id }}</td>
+                    <td>{{ pago.reserva.paquete }}</td>
+                    <td>{{ pago.monto_pagado }}</td>
+                    <td>{{ pago.fecha_pago }}</td>
+                    <td>{{ pago.metodo_pago }}</td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center">
+                        No se encontraron pagos.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+
+{% extends "appbuilder/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2>Reporte de reservas</h2>
+
+    <hr>
+
+    <!-- FORMULARIO DE FILTROS -->
+    <form method="GET" class="form-inline">
+
+        <div class="form-group">
+            <label>Fecha de salida:</label>
+            <input
+                type="date"
+                name="fecha_salida"
+                value="{{ fecha_salida }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group" style="margin-left: 10px;">
+            <label>Estado:</label>
+
+            <select name="estado" class="form-control">
+                <option value="">Todos</option>
+
+                <option value="Pendiente"
+                    {% if estado == "Pendiente" %}selected{% endif %}>
+                    Pendiente
+                </option>
+
+                <option value="Confirmada"
+                    {% if estado == "Confirmada" %}selected{% endif %}>
+                    Confirmada
+                </option>
+
+                <option value="Cancelada"
+                    {% if estado == "Cancelada" %}selected{% endif %}>
+                    Cancelada
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Buscar
+        </button>
+
+        <a href="{{ url_for('ReporteReservasView.list') }}"
+           class="btn btn-default">
+            Limpiar
+        </a>
+
+    </form>
+
+    <hr>
+
+    <!-- TABLA DE RESULTADOS -->
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th>N.º Reserva</th>
+                    <th>Cliente</th>
+                    <th>Paquete turístico</th>
+                    <th>Fecha de reserva</th>
+                    <th>Fecha de salida</th>
+                    <th>Cantidad de personas</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for reserva in reservas %}
+
+                <tr>
+                    <td>{{ reserva.reserva_id }}</td>
+                    <td>{{ reserva.cliente }}</td>
+                    <td>{{ reserva.paquete }}</td>
+                    <td>{{ reserva.fecha_reserva }}</td>
+                    <td>{{ reserva.fecha_salida }}</td>
+                    <td>{{ reserva.cantidad_personas }}</td>
+                    <td>{{ reserva.estado }}</td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center">
+                        No se encontraron reservas.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

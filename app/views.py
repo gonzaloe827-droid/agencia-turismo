@@ -1,8 +1,11 @@
 
 from flask_appbuilder import ModelView
 from flask_appbuilder.models.sqla.interface import SQLAInterface
+from flask import request
+from flask_appbuilder import BaseView, expose
+from datetime import datetime
 
-from .extensions import appbuilder
+from .extensions import appbuilder, db
 from .models import (
     Vehiculo,
     Conductor,
@@ -365,3 +368,170 @@ appbuilder.add_view(
     icon="fa-money",
     category="Agencia",
 )
+
+
+
+# ==========================================
+# 10. REPORTE DE SALIDAS Y PASAJEROS
+# ==========================================
+
+class ReporteSalidasView(BaseView):
+
+    route_base = "/reporte_salidas"
+
+    @expose("/")
+    def list(self):
+
+        # Obtener los filtros del formulario
+        fecha = request.args.get("fecha", "")
+        destino = request.args.get("destino", "")
+
+        # Consultar las salidas de la base de datos
+        consulta = db.session.query(Salida)
+
+        # Filtrar por fecha
+        if fecha:
+            fecha_convertida = datetime.strptime(fecha, "%Y-%m-%d").date()
+
+            consulta = consulta.filter(
+                Salida.fecha_inicio == fecha_convertida
+            )
+
+        # Filtrar por destino
+        if destino:
+            consulta = consulta.filter(
+                Salida.destino.ilike(f"%{destino}%")
+            )
+
+        # Ordenar por fecha
+        salidas = consulta.order_by(
+            Salida.fecha_inicio.desc()
+        ).all()
+
+        return self.render_template(
+            "reportes/salidas.html",
+            salidas=salidas,
+            fecha=fecha,
+            destino=destino
+        )
+
+
+# REGISTRO DEL REPORTE EN EL MENU
+appbuilder.add_view(
+    ReporteSalidasView,
+    "Reporte de salidas",
+    icon="fa-file-text",
+    category="Reportes",
+)
+
+
+# ==========================================
+# 11. REPORTE DE RESERVAS
+# ==========================================
+
+class ReporteReservasView(BaseView):
+
+    route_base = "/reporte_reservas"
+
+    @expose("/")
+    def list(self):
+
+        # Obtener los filtros del formulario
+        fecha_salida = request.args.get("fecha_salida", "")
+        estado = request.args.get("estado", "")
+
+        # Consultar las reservas
+        consulta = db.session.query(Reserva)
+
+        # Filtrar por fecha de salida
+        if fecha_salida:
+            fecha_convertida = datetime.strptime(
+                fecha_salida, "%Y-%m-%d"
+            ).date()
+
+            consulta = consulta.filter(
+                Reserva.fecha_salida == fecha_convertida
+            )
+
+        # Filtrar por estado
+        if estado:
+            consulta = consulta.filter(
+                Reserva.estado == estado
+            )
+
+        # Ordenar por fecha de salida
+        reservas = consulta.order_by(
+            Reserva.fecha_salida.desc()
+        ).all()
+
+        return self.render_template(
+            "reportes/reservas.html",
+            reservas=reservas,
+            fecha_salida=fecha_salida,
+            estado=estado
+        )
+
+
+# REGISTRO DEL REPORTE EN EL MENU
+appbuilder.add_view(
+    ReporteReservasView,
+    "Reporte de reservas",
+    icon="fa-calendar",
+    category="Reportes",
+)
+
+# ==========================================
+# 12. REPORTE DE PAGOS
+# ==========================================
+
+class ReportePagosView(BaseView):
+
+    route_base = "/reporte_pagos"
+
+    @expose("/")
+    def list(self):
+
+        # Obtener los filtros del formulario
+        fecha_pago = request.args.get("fecha_pago", "")
+        metodo_pago = request.args.get("metodo_pago", "")
+
+        # Consultar los pagos
+        consulta = db.session.query(Pago)
+
+        # Filtrar por fecha de pago
+        if fecha_pago:
+            fecha_convertida = datetime.strptime(
+                fecha_pago, "%Y-%m-%d"
+            ).date()
+
+            consulta = consulta.filter(
+                Pago.fecha_pago == fecha_convertida
+            )
+
+        # Filtrar por método de pago
+        if metodo_pago:
+            consulta = consulta.filter(
+                Pago.metodo_pago == metodo_pago
+            )
+
+        # Ordenar por fecha de pago
+        pagos = consulta.order_by(
+            Pago.fecha_pago.desc()
+        ).all()
+
+        return self.render_template(
+            "reportes/pagos.html",
+            pagos=pagos,
+            fecha_pago=fecha_pago,
+            metodo_pago=metodo_pago
+        )
+
+
+# REGISTRO DEL REPORTE EN EL MENU
+appbuilder.add_view(
+    ReportePagosView,
+    "Reporte de pagos",
+    icon="fa-money",
+    category="Reportes",
+)
+

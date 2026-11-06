@@ -1,0 +1,105 @@
+
+{% extends "appbuilder/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2>Reporte de salidas y pasajeros</h2>
+
+    <hr>
+
+    <!-- FORMULARIO DE FILTROS -->
+    <form method="GET" class="form-inline">
+
+        <div class="form-group">
+            <label>Fecha de salida:</label>
+            <input
+                type="date"
+                name="fecha"
+                value="{{ fecha }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group" style="margin-left: 10px;">
+            <label>Destino:</label>
+            <input
+                type="text"
+                name="destino"
+                value="{{ destino }}"
+                placeholder="Buscar destino"
+                class="form-control"
+            >
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Buscar
+        </button>
+
+        <a href="{{ url_for('ReporteSalidasView.list') }}"
+           class="btn btn-default">
+            Limpiar
+        </a>
+
+    </form>
+
+    <hr>
+
+    <!-- TABLA DE RESULTADOS -->
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Destino</th>
+                    <th>Paquete</th>
+                    <th>Conductor</th>
+                    <th>Vehículo</th>
+                    <th>Total pasajeros</th>
+                    <th>Pasajeros</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for salida in salidas %}
+
+                <tr>
+                    <td>{{ salida.fecha_inicio }}</td>
+                    <td>{{ salida.destino }}</td>
+                    <td>{{ salida.paquete }}</td>
+                    <td>{{ salida.conductor }}</td>
+                    <td>{{ salida.vehiculo }}</td>
+                    <td>{{ salida.total_personas }}</td>
+
+                    <td>
+                        {% for pasajero in salida.pasajeros %}
+                            {{ pasajero.cliente }}<br>
+                        {% else %}
+                            Sin pasajeros registrados
+                        {% endfor %}
+                    </td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center">
+                        No se encontraron salidas.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
