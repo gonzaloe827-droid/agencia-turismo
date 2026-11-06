@@ -1,0 +1,29 @@
+*.pyc
+app.db
+./tmp
+./build/*
+.idea
+env
+venv
+*.sublime*
+# Entornos virtuales
+venv/
+env/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+
+# Configuración y credenciales
+.env
+.env.*
+config.py
+
+# Archivos temporales
+*.log
+instance/
+.pytest_cache/
+
+# Editores
+.vscode/
+.idea/
