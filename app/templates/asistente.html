@@ -1,0 +1,127 @@
+
+{% extends "appbuilder/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2>
+        <i class="fa fa-comments"></i>
+        Asistente turístico de Uyuni
+    </h2>
+
+    <p>
+        Consulta nuestros paquetes turísticos,
+        precios e itinerarios disponibles.
+    </p>
+
+    <hr>
+
+    <div class="panel panel-primary">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-robot"></i>
+                Asistente virtual
+            </h3>
+        </div>
+
+        <div class="panel-body">
+
+            <form method="POST">
+
+                <div class="form-group">
+
+                    <label for="pregunta">
+                        Escribe tu pregunta:
+                    </label>
+
+                    <textarea
+                        name="pregunta"
+                        id="pregunta"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Ejemplo: ¿Cuánto cuesta el paquete de tres días?"
+                        required
+                    >{{ pregunta }}</textarea>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-paper-plane"></i>
+                    Consultar
+                </button>
+
+            </form>
+
+            {% if respuesta %}
+
+                <hr>
+
+                <div class="alert alert-info">
+
+                    <h4>
+                        <i class="fa fa-robot"></i>
+                        Respuesta del asistente
+                    </h4>
+
+                    <p style="white-space: pre-line;">
+                        {{ respuesta }}
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <h3>Paquetes registrados en la agencia</h3>
+
+    <div class="row">
+
+        {% for paquete in paquetes %}
+
+            <div class="col-md-4">
+
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <strong>{{ paquete.nombre_paquete }}</strong>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <p>
+                            <strong>Duración:</strong>
+                            {{ paquete.duracion_dias }} días
+                        </p>
+
+                        <p>
+                            <strong>Precio por persona:</strong>
+                            {{ paquete.precio_persona }}
+                        </p>
+
+                        <p>
+                            {{ paquete.descripcion or
+                            "Sin descripción registrada." }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p>No hay paquetes registrados todavía.</p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

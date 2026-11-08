@@ -4,6 +4,8 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask import request
 from flask_appbuilder import BaseView, expose
 from datetime import datetime
+from flask_appbuilder.security.decorators import has_access
+from .ai import consultar_ia
 
 from .extensions import appbuilder, db
 from .models import (
@@ -535,3 +537,88 @@ appbuilder.add_view(
     category="Reportes",
 )
 
+
+
+# ==========================================
+# 11. ASISTENTE TURISTICO CON INTELIGENCIA ARTIFICIAL
+# ==========================================
+
+class AsistenteTuristicoView(BaseView):
+
+    route_base = "/asistente_turistico"
+
+    @expose("/", methods=["GET", "POST"])
+    @has_access
+    def chat(self):
+
+        pregunta = ""
+        respuesta = ""
+
+        # Consultar los paquetes registrados en MySQL
+        paquetes = (
+            db.session.query(Paquete)
+            .order_by(Paquete.nombre_paquete)
+            .all()
+        )
+
+        # Preparar la informacion real de la agencia
+        informacion_agencia = ""
+
+        for paquete in paquetes:
+
+            informacion_agencia += (
+                f"\nPAQUETE: {paquete.nombre_paquete}\n"
+                f"DURACION: {paquete.duracion_dias} dias\n"
+                f"PRECIO POR PERSONA: {paquete.precio_persona}\n"
+                f"DESCRIPCION: {paquete.descripcion or 'Sin descripcion'}\n"
+                "ITINERARIO:\n"
+            )
+
+            itinerarios = sorted(
+                paquete.itinerarios,
+                key=lambda item: item.dia
+            )
+
+            for itinerario in itinerarios:
+
+                informacion_agencia += (
+                    f"- Dia {itinerario.dia}: "
+                    f"{itinerario.actividad}. "
+                    f"Lugar: {itinerario.lugar or 'No especificado'}. "
+                    f"Descripcion: "
+                    f"{itinerario.descripcion or 'Sin descripcion'}.\n"
+                )
+
+        if not informacion_agencia:
+            informacion_agencia = (
+                "Actualmente no hay paquetes turisticos "
+                "registrados en la base de datos."
+            )
+
+        # Procesar la pregunta del cliente
+        if request.method == "POST":
+
+            pregunta = request.form.get("pregunta", "").strip()
+
+            if pregunta:
+
+                respuesta = consultar_ia(
+                    pregunta,
+                    informacion_agencia
+                )
+
+        return self.render_template(
+            "asistente.html",
+            pregunta=pregunta,
+            respuesta=respuesta,
+            paquetes=paquetes
+        )
+
+
+# REGISTRO DEL ASISTENTE EN EL MENU
+appbuilder.add_view(
+    AsistenteTuristicoView,
+    "Asistente turístico",
+    icon="fa-comments",
+    href="/asistente_turistico/"
+)
